@@ -1,0 +1,351 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Sakshi Utturi | Product portfolio</title>
+<meta name="description" content="Product case studies by Sakshi Utturi, a full-stack engineer moving into product management.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,400;12..96,600;12..96,700&family=Newsreader:ital,opsz,wght@0,6..72,400;0,6..72,500;1,6..72,400&display=swap" rel="stylesheet">
+<style>
+:root{
+  --bg:#EEF2F3; --surface:#FFFFFF; --ink:#17252B; --muted:#52656B;
+  --peacock:#0E6E73; --peacock-soft:#D6E8E8; --marigold:#B97F06; --marigold-fill:#F3C24E;
+  --line:#CBD6D8;
+  --display:"Bricolage Grotesque","Avenir Next","Segoe UI",system-ui,sans-serif;
+  --body:"Newsreader","Iowan Old Style","Georgia",serif;
+  box-sizing:border-box;
+  padding-top:env(safe-area-inset-top,0px);
+  padding-bottom:env(safe-area-inset-bottom,0px);
+}
+@media (prefers-color-scheme:dark){
+  :root:not([data-theme="light"]){
+    --bg:#0F1A1D; --surface:#17262A; --ink:#E5EEEF; --muted:#9DB0B4;
+    --peacock:#5CC2C6; --peacock-soft:#1D3B3E; --marigold:#F0B93A; --marigold-fill:#C9951B;
+    --line:#2B4146;
+  }
+}
+:root[data-theme="dark"]{
+  --bg:#0F1A1D; --surface:#17262A; --ink:#E5EEEF; --muted:#9DB0B4;
+  --peacock:#5CC2C6; --peacock-soft:#1D3B3E; --marigold:#F0B93A; --marigold-fill:#C9951B;
+  --line:#2B4146;
+}
+*,*::before,*::after{box-sizing:inherit}
+html{scroll-behavior:smooth;scroll-padding-top:calc(env(safe-area-inset-top,0px) + 4.5rem)}
+@media (prefers-reduced-motion:reduce){html{scroll-behavior:auto}}
+body{margin:0;background:var(--bg);color:var(--ink);font-family:var(--body);font-size:1.125rem;line-height:1.6}
+a{color:var(--peacock);text-underline-offset:.18em}
+a:focus-visible,button:focus-visible{outline:3px solid var(--marigold);outline-offset:3px;border-radius:2px}
+h1,h2,h3,h4{font-family:var(--display);line-height:1.1;margin:0;letter-spacing:-.01em}
+p{margin:0 0 1em}
+.wrap{max-width:68rem;margin:0 auto;padding:0 1.5rem}
+
+/* header */
+.top{position:sticky;top:env(safe-area-inset-top,0px);z-index:5;background:var(--bg);border-bottom:1px solid var(--line)}
+.top .wrap{display:flex;justify-content:space-between;align-items:center;gap:1rem;padding-top:.8rem;padding-bottom:.8rem}
+.name{font-family:var(--display);font-weight:700;font-size:1.05rem;color:var(--ink);text-decoration:none}
+.top nav{display:flex;gap:1.25rem;flex-wrap:wrap}
+.top nav a{font-family:var(--display);font-size:.95rem;color:var(--ink);text-decoration:none}
+.top nav a:hover{color:var(--peacock);text-decoration:underline}
+
+/* hero */
+.hero{padding-top:5rem;padding-bottom:4rem}
+.hero h1{font-size:clamp(2.4rem,7vw,5.2rem);font-weight:700;max-width:16ch;letter-spacing:-.03em}
+.hero h1 span{display:block;color:var(--peacock)}
+.hero .lede{max-width:38rem;margin-top:2rem;font-size:1.3rem;line-height:1.5}
+.status{margin-top:1.75rem;font-family:var(--display);font-size:1rem;color:var(--muted)}
+.status b{color:var(--ink);font-weight:600}
+
+/* sections */
+section{padding:3.5rem 0;border-top:1px solid var(--line)}
+.sec-title{font-size:clamp(1.7rem,3.5vw,2.4rem);font-weight:700;margin-bottom:.6rem}
+.sec-note{color:var(--muted);max-width:42rem;margin-bottom:2.5rem}
+
+/* case */
+.case{display:grid;grid-template-columns:15rem 1fr;gap:2.5rem;padding:2.75rem 0;border-top:1px solid var(--line)}
+.case:first-of-type{border-top:0;padding-top:0}
+.rail h3{font-size:1.35rem;font-weight:700;margin-bottom:.9rem}
+.rail dl{margin:0;font-family:var(--display);font-size:.92rem}
+.rail dt{color:var(--muted);margin-top:.8rem}
+.rail dd{margin:0}
+.story{max-width:40rem;min-width:0}
+.question{font-family:var(--display);font-weight:600;font-size:clamp(1.5rem,3vw,2.1rem);line-height:1.15;letter-spacing:-.02em;margin-bottom:1.25rem}
+.story h4{font-size:1.05rem;font-weight:700;margin:1.9rem 0 .5rem;color:var(--peacock)}
+.story ul{margin:0 0 1em;padding-left:1.2rem}
+.story li{margin-bottom:.4em}
+blockquote{margin:1.2rem 0;padding:.2rem 0 .2rem 1.1rem;border-left:4px solid var(--marigold-fill);font-style:italic}
+blockquote cite{display:block;font-style:normal;font-family:var(--display);font-size:.9rem;color:var(--muted);margin-top:.3rem}
+.limits{background:var(--peacock-soft);padding:1rem 1.2rem;border-radius:6px;font-size:1rem;margin-top:1.5rem}
+.limits strong{font-family:var(--display)}
+
+.ideas{display:grid;gap:1px;background:var(--line);border:1px solid var(--line);border-radius:6px;overflow:hidden;margin:1rem 0}
+.ideas div{background:var(--surface);padding:1rem 1.2rem}
+.ideas h5{font-family:var(--display);font-size:1.05rem;margin:0 0 .3rem}
+.ideas p{margin:0;font-size:1rem}
+.ideas small{display:block;margin-top:.45rem;font-family:var(--display);font-size:.88rem;color:var(--muted)}
+
+/* funnel */
+.funnel{margin:1.2rem 0 .4rem;display:grid;gap:.35rem}
+.funnel .bar{background:var(--peacock-soft);border-radius:4px;padding:.45rem .8rem;font-family:var(--display);font-size:.95rem;min-width:11rem}
+.funnel .bar.pri{background:var(--marigold-fill);color:#17252B;font-weight:600}
+.caption{font-family:var(--display);font-size:.88rem;color:var(--muted)}
+
+/* roadmap */
+.years{list-style:none;padding:0;margin:1rem 0;display:grid;grid-template-columns:repeat(3,1fr);gap:1px;background:var(--line);border:1px solid var(--line);border-radius:6px;overflow:hidden}
+.years li{background:var(--surface);padding:1rem 1.1rem;margin:0}
+.years b{display:block;font-family:var(--display);font-size:1.1rem}
+.years span{font-family:var(--display);font-size:.88rem;color:var(--muted)}
+.years p{font-size:.98rem;margin:.4rem 0 0}
+
+/* smaller cases */
+.more{display:grid;grid-template-columns:repeat(3,1fr);gap:1.5rem;margin-top:1rem}
+.more article{background:var(--surface);border:1px solid var(--line);border-radius:6px;padding:1.4rem}
+.more h3{font-size:1.2rem;margin-bottom:.6rem}
+.more p{font-size:1rem;margin-bottom:.6em}
+.more .kind{font-family:var(--display);font-size:.88rem;color:var(--muted)}
+.more .soon{border-style:dashed;background:transparent}
+
+/* background */
+.two{display:grid;grid-template-columns:1fr 1fr;gap:3rem}
+.two h3{font-size:1.2rem;margin-bottom:.8rem}
+.two ul{margin:0;padding-left:1.2rem}
+.two li{margin-bottom:.5em}
+.tags{font-family:var(--display);font-size:.98rem;line-height:1.7}
+.tags b{display:block;margin-top:.9rem;color:var(--muted);font-weight:600}
+.tags b:first-child{margin-top:0}
+
+/* contact */
+.contact h2{font-size:clamp(1.9rem,4.5vw,3rem);max-width:20ch;margin-bottom:1.2rem}
+.contact a.mail{font-family:var(--display);font-size:1.3rem;font-weight:600}
+footer{padding:2rem 0 3rem;color:var(--muted);font-family:var(--display);font-size:.9rem;border-top:1px solid var(--line)}
+
+@media (max-width:820px){
+  .case{grid-template-columns:1fr;gap:1.25rem}
+  .more,.two,.years{grid-template-columns:1fr}
+  .hero{padding-top:3rem;padding-bottom:2.5rem}
+  .top nav{gap:.9rem}
+  .top nav a{font-size:.9rem}
+}
+@media (max-width:480px){
+  .name{display:none}
+}
+</style>
+</head>
+<body>
+
+<header class="top">
+  <div class="wrap">
+    <a class="name" href="#top">Sakshi Utturi</a>
+    <nav aria-label="Sections">
+      <a href="#cases">Case studies</a>
+      <a href="#background">Background</a>
+      <a href="#contact">Contact</a>
+    </nav>
+  </div>
+</header>
+
+<main id="top">
+  <div class="wrap hero">
+    <h1>I spent three years building software. <span>Now I'm learning to decide what gets built.</span></h1>
+    <p class="lede">I'm Sakshi Utturi, a full-stack engineer at Clarivate Analytics in Bangalore and an aspiring product manager. These are the product problems I've worked through so far: who has the problem, what I'd build, and how I'd know it worked.</p>
+    <p class="status"><b>Currently:</b> completing the Artribe Product Management program, capstone project under way.</p>
+  </div>
+
+  <section id="cases">
+    <div class="wrap">
+      <h2 class="sec-title">Case studies</h2>
+      <p class="sec-note">These are course case studies from the Artribe PM program, not work done for the companies named. Where I had no internal data, I say so and mark estimates as estimates.</p>
+
+      <article class="case">
+        <div class="rail">
+          <h3>Uber: Find My Ride</h3>
+          <dl>
+            <dt>Type</dt><dd>Market research, user interviews, product ideas</dd>
+            <dt>Market</dt><dd>India</dd>
+            <dt>Research</dt><dd>10 in-person interviews: nine riders, one driver partner</dd>
+            <dt>Delivered</dt><dd>Research document, deck, recorded walkthrough</dd>
+          </dl>
+        </div>
+        <div class="story">
+          <p class="question">The driver has arrived. Why can't rider and driver find each other?</p>
+          <p>Find My Ride is about the last 50 metres of a pickup. The app says the car is here, but the rider is at one gate and the driver at another. I looked at where this happens in India, what people do about it today, and what Uber could build.</p>
+
+          <h4>What I did</h4>
+          <ul>
+            <li>Sized the opportunity from public data: Uber has about 39 million monthly active users in India, and Indian airports handled about 420 million passengers in FY2025-26.</li>
+            <li>Mapped the alternatives riders rely on today, from phone calls and number plates to Uber's own Spotlight and pickup messages, and where each one falls short.</li>
+            <li>Checked the rules that shape the solution: the 2025 aggregator guidelines, data protection law, and airport pickup zones.</li>
+            <li>Interviewed ten people about their most recent difficult pickup, across airports, stations, tech parks, malls and night travel.</li>
+          </ul>
+
+          <h4>What I heard</h4>
+          <ul>
+            <li>All ten fall back on a phone call, and the call is itself a pain point: noise, language gaps, a distracted driver.</li>
+            <li>Rider and driver can be at the "same" pin and still be apart, because the pin doesn't say which gate or side.</li>
+            <li>The number plate is the main way to verify a vehicle, but it's hard to read at night and on autos and bikes.</li>
+            <li>Riders accept sharing precise location if it is limited to the pickup window and explained.</li>
+          </ul>
+          <blockquote>"We were both technically at the same pickup location but on different sides."<cite>Frequent railway traveller</cite></blockquote>
+          <blockquote>"A vague pin is the biggest issue."<cite>Driver partner</cite></blockquote>
+
+          <h4>What I proposed</h4>
+          <p>Treat pickup as a two-sided problem, give both sides one shared reference, and solve it in software before touching hardware.</p>
+          <div class="ideas">
+            <div><h5>Guided Pickup</h5><p>The app names one exact gate or landmark and shows it to both rider and driver, with walking directions and a photo of the spot.</p><small>Measured by: time from driver arrival to trip start; share of pickups without a call</small></div>
+            <div><h5>Vehicle Match</h5><p>When the car is near, both phones show the same colour and short code, and the rider sees the last four digits of the plate in large type.</p><small>Measured by: wrong-vehicle reports; rider confidence, especially at night</small></div>
+            <div><h5>No-Call Coordination</h5><p>One-tap messages such as "I am at Gate 3", translated into the driver's language and read aloud, with location shared only until the trip starts.</p><small>Measured by: calls per trip before pickup; cancellations after driver arrival</small></div>
+          </div>
+
+          <p class="limits"><strong>Limits I'd flag.</strong> Ten interviews is a small sample, and the driver's view and the night-safety insight each rest on a single voice. My target of about 8 million riders assumes 20% of Uber's monthly users face a difficult pickup, which is an illustration to be replaced with Uber's trip data.</p>
+        </div>
+      </article>
+
+      <article class="case">
+        <div class="rail">
+          <h3>Zomato: funnel and retention</h3>
+          <dl>
+            <dt>Type</dt><dd>Funnel analysis, cohort analysis, metrics design</dd>
+            <dt>Scope</dt><dd>Seven funnel stages, six cohorts, thirteen solutions</dd>
+            <dt>Delivered</dt><dd>Strategy document, deck, recorded walkthrough</dd>
+          </dl>
+        </div>
+        <div class="story">
+          <p class="question">Where do hungry people give up, and what brings them back?</p>
+          <p>I broke Zomato's food delivery journey into seven stages, from app open to order delivered, and wrote one testable hypothesis for each. Then I looked at retention across six cohorts and defined how every proposed solution would be measured.</p>
+
+          <h4>The funnel, and where I'd focus</h4>
+          <div class="funnel" role="img" aria-label="Seven funnel stages. Restaurant discovery, cart creation, checkout and order delivered are the priority stages.">
+            <div class="bar" style="width:100%">App open</div>
+            <div class="bar pri" style="width:88%">Restaurant discovery</div>
+            <div class="bar" style="width:76%">Menu view</div>
+            <div class="bar pri" style="width:64%">Cart creation</div>
+            <div class="bar pri" style="width:54%">Checkout</div>
+            <div class="bar" style="width:46%">Order placed</div>
+            <div class="bar pri" style="width:40%">Order delivered</div>
+          </div>
+          <p class="caption">Bar widths are illustrative. Highlighted stages are the ones I prioritised.</p>
+          <ul>
+            <li><b>Restaurant discovery</b> has the largest reach: every ordering session passes through it.</li>
+            <li><b>Cart and checkout</b> lose the most intent: these users have already chosen their food, and late fees or failed payments are within Zomato's control.</li>
+            <li><b>Order delivered</b> links the funnel to retention: a late or wrong order costs every future order from that user.</li>
+          </ul>
+
+          <h4>Example hypotheses</h4>
+          <ul>
+            <li>If discovery shows a "top 3 for you" shortlist with delivery time and total cost, more sessions will reach a menu, because fewer and clearer options shorten the decision.</li>
+            <li>If the full price, including fees, is visible from the menu page, fewer carts will be abandoned, because there is no price shock at the bill.</li>
+            <li>If new users see a three-order journey with rewards on the second and third order, second-order rate will rise, because early repetition builds the habit.</li>
+          </ul>
+
+          <h4>How I'd measure it</h4>
+          <p>One company North Star: successfully delivered orders per month. Each of the thirteen solutions gets its own ladder of input, leading, output and lagging metrics that feed into it, with guardrails on contribution margin, notification opt-outs and satisfaction so growth isn't bought with discounts.</p>
+
+          <p class="limits"><strong>Limits I'd flag.</strong> I had no access to Zomato's analytics, so drop-off points are reasoned from the user journey and I quote no drop-off percentages. The priorities should be confirmed against measured conversion before anything is built.</p>
+        </div>
+      </article>
+
+      <article class="case">
+        <div class="rail">
+          <h3>B2B product strategy</h3>
+          <dl>
+            <dt>Type</dt><dd>Segmentation, positioning, three-year strategy</dd>
+            <dt>Product</dt><dd>An AI customer support tool for mid-sized businesses</dd>
+            <dt>Delivered</dt><dd>Strategy document</dd>
+          </dl>
+        </div>
+        <div class="story">
+          <p class="question">How does "another AI chatbot" become something customers can't easily replace?</p>
+          <p>The brief: an AI support product is struggling with adoption among mid-sized businesses. Answering questions has become a commodity, with large vendors pricing it at around one to two dollars per resolution. Competing on answers alone is a losing position for a smaller vendor.</p>
+
+          <h4>Who to serve first</h4>
+          <p>High-volume, digital-first mid-market companies of 200 to 1,000 employees, starting with e-commerce and D2C brands. They have support teams of roughly 15 to 75 agents, already run Zendesk or Freshdesk, and have nobody on staff to build automation.</p>
+
+          <h4>The problem worth solving</h4>
+          <p>I called it the resolution gap: the distance between answering a question and completing the customer's request. A bot can explain the refund policy, but issuing the refund still means a human moving between the helpdesk, the order system and the payment gateway.</p>
+
+          <h4>How it grows</h4>
+          <p>Land on one or two request types on top of the existing helpdesk, in draft mode where an agent approves each action. Then expand across request types, channels and teams.</p>
+          <ol class="years">
+            <li><span>Year 1</span><b>Resolve</b><p>End-to-end resolution of the top repetitive requests in e-commerce.</p></li>
+            <li><span>Year 2</span><b>Orchestrate</b><p>Cross-team workflows and insights; fintech and subscriptions next.</p></li>
+            <li><span>Year 3</span><b>Platform</b><p>Workflow builder and connector library; move toward enterprise.</p></li>
+          </ol>
+          <p>North Star: share of tickets resolved end to end without a human, at equal or better customer satisfaction.</p>
+
+          <p class="limits"><strong>Limits I'd flag.</strong> The diagnosis is a set of hypotheses to validate in customer interviews. The account economics (about $144,000 a year per account) are built on assumptions, not data, and the number of target accounts is not yet counted.</p>
+        </div>
+      </article>
+
+      <div class="more">
+        <article>
+          <p class="kind">Growth strategy</p>
+          <h3>Airbnb India: product-led growth</h3>
+          <p>A growth strategy for urban Gen Z and young millennials who take short, frequent trips. The shift: compete on the quality of the entire trip, not just the stay.</p>
+          <p>North Star: completed trips per monthly active traveller, driven by a loop of discover, personalise, experience, share and return.</p>
+        </article>
+        <article>
+          <p class="kind">Product and system design</p>
+          <h3>QuickBite: scaling a food delivery app</h3>
+          <p>A design brief for taking a food delivery app from 5,000 to 2,000,000 users in 12 months.</p>
+          <p>I framed each requirement by what it demands of the system: fast location-based search for browsing, durable transactions for orders, and a high-volume stream for live rider tracking.</p>
+        </article>
+        <article class="soon">
+          <p class="kind">In progress</p>
+          <h3>Capstone project</h3>
+          <p>My end-of-program capstone is under way. The full case study will be added here once it's complete.</p>
+        </article>
+      </div>
+    </div>
+  </section>
+
+  <section id="background">
+    <div class="wrap">
+      <h2 class="sec-title">Background</h2>
+      <p class="sec-note">Three years of shipping software means I can talk to engineers about feasibility and scale, and scope work realistically.</p>
+      <div class="two">
+        <div>
+          <h3>Software engineer, Clarivate Analytics</h3>
+          <p class="caption" style="margin-bottom:.8rem">Bangalore, July 2023 to present</p>
+          <ul>
+            <li>Cut API response latency by 20% on high-traffic modules.</li>
+            <li>Built entitlement-based access so each customer sees only the content their subscription and role allow.</li>
+            <li>Shipped Elasticsearch-powered search and an internal side-by-side document comparison tool.</li>
+            <li>Helped reduce repeat Sev 1/2 incidents to zero over two consecutive quarters.</li>
+            <li>Part of the team that won Team of the Quarter for delivering an Angular migration on time.</li>
+          </ul>
+        </div>
+        <div>
+          <h3>Skills and learning</h3>
+          <p class="tags">
+            <b>Product</b>
+            Problem discovery, user interviews, product strategy, prioritisation, go-to-market, product-led growth
+            <b>Analytics</b>
+            North Star and metric ladders, funnel and cohort analysis, experiment design, SQL
+            <b>Technical</b>
+            REST APIs, microservices, system design, Java, Angular, Elasticsearch
+            <b>Studying now</b>
+            Artribe Product Management program; Mixpanel Fundamentals; Google Cloud Generative AI Fundamentals; Atlassian Agile in Jira
+            <b>Education</b>
+            B.Tech in Mechanical Engineering, KLE Dr M.S. Sheshgiri College of Engineering and Technology
+          </p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section id="contact" class="contact">
+    <div class="wrap">
+      <h2>Looking for an associate product manager role.</h2>
+      <p style="max-width:36rem">If you're hiring, or want the full document behind any case study here, I'd be glad to hear from you.</p>
+      <p><a class="mail" href="mailto:utturisakshi@gmail.com">utturisakshi@gmail.com</a></p>
+    </div>
+  </section>
+</main>
+
+<footer>
+  <div class="wrap">Sakshi Utturi, Bangalore. Case studies are course work and are not affiliated with the companies named.</div>
+</footer>
+
+</body>
+</html>
