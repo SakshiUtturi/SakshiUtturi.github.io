@@ -1,0 +1,407 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<style>[hidden]{display:none!important} body{margin:0} img{max-width:100%}</style>
+<title>Dunzo 2.0 Prototype</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,600;12..96,800&family=Instrument+Sans:wght@400;500;600;700&family=JetBrains+Mono:wght@500;700&display=swap">
+<style>
+/* Layout: phone-sized app on the left, PM annotation rail on the right; stacks on mobile */
+:root{
+  --bg:#EEF2EC; --surface:#FFFFFF; --ink:#13241B; --muted:#5E6E64; --line:#DCE4DD;
+  --green:#0A7A4B; --green-ink:#FFFFFF; --leaf:#E2F3E9; --sun:#FFD54A; --sun-ink:#3A2E00;
+  --warn:#B4520F; --frame:#0F1C15;
+  --f-display:"Bricolage Grotesque", "Segoe UI", system-ui, sans-serif;
+  --f-body:"Instrument Sans", "Segoe UI", system-ui, sans-serif;
+  --f-mono:"JetBrains Mono", ui-monospace, Menlo, monospace;
+}
+@media (prefers-color-scheme: dark){:root:not([data-theme="light"]){
+  --bg:#0C1510; --surface:#15221B; --ink:#E7F0EA; --muted:#9DB0A4; --line:#2A3A31;
+  --green:#2FBF7E; --green-ink:#06130C; --leaf:#173628; --sun:#FFD54A; --sun-ink:#2A2100; --warn:#F2A15C; --frame:#000;
+  color-scheme:dark}}
+:root[data-theme="dark"]{
+  --bg:#0C1510; --surface:#15221B; --ink:#E7F0EA; --muted:#9DB0A4; --line:#2A3A31;
+  --green:#2FBF7E; --green-ink:#06130C; --leaf:#173628; --sun:#FFD54A; --sun-ink:#2A2100; --warn:#F2A15C; --frame:#000;
+  color-scheme:dark}
+*{box-sizing:border-box}
+body{background:var(--bg);color:var(--ink);font-family:var(--f-body);font-size:15px;line-height:1.45;
+  padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px));padding-block:20px}
+.wrap{max-width:1040px;margin:0 auto;display:grid;grid-template-columns:400px minmax(0,1fr);gap:32px;align-items:start}
+@media (max-width:860px){.wrap{grid-template-columns:minmax(0,1fr)}}
+.banner{max-width:1040px;margin:0 auto 14px;font-size:12.5px;color:var(--muted);display:flex;gap:10px;flex-wrap:wrap;align-items:center}
+.banner b{color:var(--ink)}
+.tag{font-family:var(--f-mono);font-size:11px;letter-spacing:.06em;text-transform:uppercase;background:var(--sun);color:var(--sun-ink);padding:3px 8px;border-radius:4px}
+
+/* phone */
+.phone{width:100%;max-width:400px;margin:0 auto;background:var(--frame);border-radius:38px;padding:10px;box-shadow:0 20px 50px rgba(10,40,25,.18)}
+.screen{background:var(--surface);border-radius:30px;height:760px;max-height:calc(100vh - 80px);min-height:620px;overflow:hidden;display:flex;flex-direction:column;position:relative}
+.status{display:flex;justify-content:space-between;padding:12px 22px 4px;font-family:var(--f-mono);font-size:11px;color:var(--muted)}
+.view{flex:1;overflow-y:auto;padding:6px 18px 18px}
+.view[hidden]{display:none!important}
+.nav{display:flex;border-top:1px solid var(--line);background:var(--surface)}
+.nav button{flex:1;background:none;border:0;padding:10px 4px 12px;font:600 11.5px var(--f-body);color:var(--muted);cursor:pointer}
+.nav button[aria-current="true"]{color:var(--green)}
+.nav svg{display:block;margin:0 auto 3px;width:20px;height:20px}
+
+h1,h2,h3{font-family:var(--f-display);margin:0;text-wrap:balance}
+h1{font-size:28px;line-height:1.05;font-weight:800;letter-spacing:-.01em}
+h2{font-size:20px;font-weight:800}
+h3{font-size:15px;font-weight:600;font-family:var(--f-body)}
+.muted{color:var(--muted)} .small{font-size:12.5px}
+.mono{font-family:var(--f-mono);font-variant-numeric:tabular-nums}
+.stack{display:flex;flex-direction:column;gap:12px}
+.row{display:flex;gap:10px;align-items:center}
+.between{justify-content:space-between}
+.back{align-self:flex-start;text-align:left;background:none;border:0;color:var(--muted);font:600 13px var(--f-body);padding:4px 0;cursor:pointer}
+
+.brand{font-family:var(--f-display);font-weight:800;font-size:22px;color:var(--green);letter-spacing:-.02em}
+.loc{font-size:12.5px;color:var(--muted)}
+.ask{background:var(--leaf);border-radius:20px;padding:16px;display:flex;flex-direction:column;gap:12px}
+.seg{display:grid;grid-template-columns:1fr 1fr;background:var(--surface);border-radius:12px;padding:4px;gap:4px}
+.seg button{border:0;background:none;border-radius:9px;padding:9px;font:600 14px var(--f-body);color:var(--muted);cursor:pointer}
+.seg button[aria-pressed="true"]{background:var(--green);color:var(--green-ink)}
+.field{display:flex;flex-direction:column;gap:5px}
+.field label{font-size:12px;font-weight:600;color:var(--muted);letter-spacing:.02em}
+.field input,.field select,.field textarea{font:500 14.5px var(--f-body);color:var(--ink);background:var(--surface);border:1.5px solid var(--line);border-radius:12px;padding:11px 12px;width:100%}
+.field textarea{resize:none}
+input:focus-visible,select:focus-visible,textarea:focus-visible,button:focus-visible{outline:2.5px solid var(--green);outline-offset:2px}
+.cta{border:0;background:var(--green);color:var(--green-ink);font:700 15.5px var(--f-body);padding:14px;border-radius:14px;cursor:pointer;width:100%}
+.cta.ghost{background:transparent;color:var(--ink);border:1.5px solid var(--line)}
+.cta.sun{background:var(--sun);color:var(--sun-ink)}
+.chips{display:flex;gap:8px;flex-wrap:wrap}
+.chip{border:1.5px solid var(--line);background:var(--surface);color:var(--ink);border-radius:999px;padding:6px 11px;font:500 12.5px var(--f-body);cursor:pointer}
+.store{display:grid;grid-template-columns:42px minmax(0,1fr) auto;gap:10px;align-items:center;padding:10px 0;border-bottom:1px solid var(--line)}
+.store:last-child{border-bottom:0}
+.av{width:42px;height:42px;border-radius:12px;display:grid;place-items:center;font:800 15px var(--f-display);background:var(--leaf);color:var(--green)}
+.promise{display:flex;gap:10px;align-items:flex-start;border:1.5px dashed var(--green);border-radius:14px;padding:11px 12px;font-size:12.5px}
+.promise svg{flex:none;color:var(--green)}
+
+.cap{display:flex;flex-direction:column;gap:6px}
+.cap-top{display:flex;justify-content:space-between;align-items:baseline}
+.cap-val{font:700 22px var(--f-mono)}
+input[type=range]{width:100%;accent-color:var(--green)}
+.opts{display:grid;grid-template-columns:1fr 1fr;gap:8px}
+.opt{border:1.5px solid var(--line);border-radius:14px;padding:10px;text-align:left;background:var(--surface);color:var(--ink);cursor:pointer;font:inherit}
+.opt[aria-pressed="true"]{border-color:var(--green);background:var(--leaf)}
+.opt b{display:block;font-size:14px} .opt span{font-size:12px;color:var(--muted)}
+.bill{border-top:1.5px dashed var(--line);padding-top:10px;display:flex;flex-direction:column;gap:5px;font-size:13.5px}
+.bill .row{justify-content:space-between}
+.bill .total{font-weight:700;font-size:15px;border-top:1px solid var(--line);padding-top:7px}
+
+.track{display:flex;flex-direction:column;gap:0;margin-top:6px}
+.step{display:grid;grid-template-columns:22px minmax(0,1fr);gap:10px;padding-bottom:14px;position:relative}
+.step:before{content:"";position:absolute;left:10px;top:20px;bottom:0;width:2px;background:var(--line)}
+.step:last-child:before{display:none}
+.dot{width:22px;height:22px;border-radius:50%;border:2px solid var(--line);background:var(--surface);display:grid;place-items:center;z-index:1}
+.step.done .dot{background:var(--green);border-color:var(--green)}
+.step.now .dot{border-color:var(--green);box-shadow:0 0 0 4px var(--leaf)}
+.step.done .dot:after{content:"";width:6px;height:10px;border:solid var(--green-ink);border-width:0 2px 2px 0;transform:rotate(45deg) translate(-1px,-1px)}
+.rider{display:flex;gap:12px;align-items:center;background:var(--leaf);border-radius:16px;padding:12px}
+.rider .av{background:var(--surface)}
+.map{height:150px;border-radius:16px;overflow:hidden;background:var(--leaf);position:relative}
+.map canvas{width:100%;height:100%;display:block}
+
+.proof{border-radius:18px;overflow:hidden;border:1.5px solid var(--line)}
+.proof-img{display:grid;grid-template-columns:1fr 1fr;height:170px}
+.proof-img > div{position:relative;display:grid;place-items:center}
+.proof-img .ph1{background:linear-gradient(160deg,#F8E7C7,#E9C88E)}
+.proof-img .ph2{background:#F4F4EF}
+.receipt{background:#fff;color:#222;width:78%;padding:9px 10px;font:500 9.5px var(--f-mono);box-shadow:0 3px 10px rgba(0,0,0,.12);line-height:1.5}
+.receipt .rl{display:flex;justify-content:space-between;gap:6px}
+.receipt hr{border:0;border-top:1px dashed #999;margin:4px 0}
+.stamp{position:absolute;left:8px;bottom:8px;background:rgba(0,0,0,.6);color:#fff;font:500 10px var(--f-mono);padding:3px 6px;border-radius:5px}
+.verdict{padding:12px 14px;display:flex;flex-direction:column;gap:6px}
+.ok{color:var(--green);font-weight:700}
+.meter{height:8px;border-radius:5px;background:var(--line);overflow:hidden}
+.meter i{display:block;height:100%;background:var(--green)}
+.timer{font:700 13px var(--f-mono);color:var(--warn)}
+
+.otp{display:flex;gap:8px;justify-content:center}
+.otp span{width:52px;height:62px;border-radius:14px;background:var(--leaf);display:grid;place-items:center;font:700 28px var(--f-mono);color:var(--green)}
+.stars{display:flex;gap:6px;justify-content:center}
+.stars button{background:none;border:0;font-size:30px;color:var(--line);cursor:pointer;line-height:1}
+.stars button.on{color:var(--sun)}
+.done-hero{text-align:center;padding:14px 0 4px}
+.done-hero .badge{width:64px;height:64px;border-radius:50%;background:var(--green);display:grid;place-items:center;margin:0 auto 10px}
+
+.kpis{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:8px}
+.kpi{background:var(--leaf);border-radius:14px;padding:10px}
+.kpi b{display:block;font:700 19px var(--f-mono)} .kpi span{font-size:11.5px;color:var(--muted)}
+.qr{display:grid;grid-template-columns:96px minmax(0,1fr);gap:12px;align-items:center;border:1.5px solid var(--line);border-radius:16px;padding:12px}
+.qr canvas{width:96px;height:96px;image-rendering:pixelated;border-radius:6px;background:#fff}
+.order{display:grid;grid-template-columns:minmax(0,1fr) auto;gap:4px 10px;padding:10px 0;border-bottom:1px solid var(--line);font-size:13.5px}
+.pill{font:600 11px var(--f-body);padding:3px 8px;border-radius:999px;background:var(--leaf);color:var(--green);justify-self:end}
+.pill.wait{background:var(--sun);color:var(--sun-ink)}
+.toast{position:absolute;left:16px;right:16px;bottom:72px;background:var(--ink);color:var(--surface);padding:10px 12px;border-radius:12px;font-size:13px;transition:opacity .2s}
+
+/* annotation rail */
+.rail{display:flex;flex-direction:column;gap:16px;min-width:0}
+.rail h1{font-size:34px}
+.rail .lede{font-size:15.5px;color:var(--muted);max-width:60ch}
+.note{background:var(--surface);border:1px solid var(--line);border-radius:16px;padding:16px 18px;display:flex;flex-direction:column;gap:8px}
+.note .eyebrow{font:600 11px var(--f-mono);letter-spacing:.08em;text-transform:uppercase;color:var(--green)}
+.note h2{font-size:22px}
+.note ul{margin:0;padding-left:18px;display:flex;flex-direction:column;gap:4px}
+.flow{display:flex;flex-wrap:wrap;gap:6px}
+.flow button{border:1.5px solid var(--line);background:var(--surface);color:var(--ink);border-radius:999px;padding:6px 12px;font:600 12.5px var(--f-body);cursor:pointer}
+.flow button[aria-current="true"]{background:var(--ink);color:var(--surface);border-color:var(--ink)}
+.metric{display:flex;gap:8px;flex-wrap:wrap}
+.metric span{font:500 12px var(--f-mono);background:var(--leaf);color:var(--green);padding:4px 8px;border-radius:6px}
+@media (prefers-reduced-motion:reduce){*{transition:none!important;animation:none!important}}
+</style>
+</head>
+<body>
+
+
+<div class="banner"><span class="tag">Concept prototype</span><span><b>Dunzo 2.0</b> · Product Rescue case study by Sakshi Utturi · not affiliated with Dunzo · sample data</span></div>
+
+<div class="wrap">
+  <div class="phone" aria-label="Prototype phone">
+    <div class="screen">
+      <div class="status"><span>9:41</span><span>HSR Layout, Bengaluru</span></div>
+
+      <!-- HOME -->
+      <section class="view" id="v-home">
+        <div class="stack">
+          <div class="row between"><span class="brand">dunzo</span><span class="loc">Home · 27th Main ▾</span></div>
+          <h1>What do you need done today?</h1>
+          <div class="ask">
+            <div class="seg" role="group" aria-label="Errand type">
+              <button id="seg-get" aria-pressed="true" onclick="setMode('get')">Get it for me</button>
+              <button id="seg-send" aria-pressed="false" onclick="setMode('send')">Send something</button>
+            </div>
+            <div class="field"><label for="q">Anything, from any shop</label>
+              <input id="q" value="Amma's BP tablets from Sri Sai Medicals, Jayanagar"></div>
+            <button class="cta" onclick="go(document.getElementById('seg-send').getAttribute('aria-pressed')==='true'?'send':'create')">Continue</button>
+          </div>
+          <div class="chips">
+            <button class="chip" onclick="pick('Laptop charger from my office desk, Koramangala')">Charger from office</button>
+            <button class="chip" onclick="pick('1 kg black forest cake from Lakeview Bakery')">Cake from Lakeview</button>
+            <button class="chip" onclick="pick('Collect stitched kurtas from Sri Tailors')">Tailor pick-up</button>
+          </div>
+          <div class="promise"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 3l8 3v6c0 4.5-3.4 8.3-8 9-4.6-.7-8-4.5-8-9V6z"/><path d="M8.5 12l2.5 2.5 4.5-5"/></svg>
+            <div><b>Dunzo Promise</b><br><span class="muted">See the item and bill before you pay. Wrong item or damage, full refund.</span></div></div>
+          <div class="row between"><h3>Neighbourhood stores on Dunzo</h3><span class="small muted">near you</span></div>
+          <div>
+            <div class="store"><div class="av">LB</div><div><b>Lakeview Bakery</b><div class="small muted">Cakes, breads · 1.2 km</div></div><span class="small mono">₹45</span></div>
+            <div class="store"><div class="av">MP</div><div><b>Meena's Pharmacy</b><div class="small muted">Medicines · Rx upload · 0.8 km</div></div><span class="small mono">₹40</span></div>
+            <div class="store"><div class="av">PP</div><div><b>Paws &amp; Pals</b><div class="small muted">Pet food, supplies · 2.1 km</div></div><span class="small mono">₹55</span></div>
+          </div>
+        </div>
+      </section>
+
+      <!-- CREATE ERRAND -->
+      <section class="view" id="v-create" hidden>
+        <div class="stack">
+          <button class="back" onclick="go('home')">← Back</button>
+          <h2>Get it for me</h2>
+          <div class="field"><label for="item">What to buy</label><textarea id="item" rows="2">Amma's BP tablets from Sri Sai Medicals, Jayanagar</textarea></div>
+          <div class="field"><label for="drop">Deliver to</label><select id="drop"><option>Amma's home · 4th Block, Jayanagar</option><option>Home · 27th Main, HSR Layout</option></select></div>
+          <div class="cap">
+            <div class="cap-top"><label for="capr" class="small" style="font-weight:600;color:var(--muted)">Item budget cap</label><span class="cap-val" id="capv">₹500</span></div>
+            <input type="range" id="capr" min="100" max="3000" step="50" value="500" oninput="updCap()">
+            <span class="small muted">Your rider can't spend above this without your approval.</span>
+          </div>
+          <div class="opts" role="group" aria-label="Speed">
+            <button class="opt" id="o-inst" aria-pressed="true" onclick="speed('inst')"><b>Now</b><span>~35 min · ₹69</span></button>
+            <button class="opt" id="o-sch" aria-pressed="false" onclick="speed('sch')"><b>Within 60 min</b><span>Batched · ₹49</span></button>
+          </div>
+          <div class="bill">
+            <div class="row"><span>Item (paid at bill value)</span><span class="mono" id="b-cap">up to ₹500</span></div>
+            <div class="row"><span>Errand fee · 4.2 km</span><span class="mono" id="b-fee">₹69</span></div>
+            <div class="row"><span>Promise cover</span><span class="mono">Free</span></div>
+            <div class="row total"><span>You pay at most</span><span class="mono" id="b-tot">₹569</span></div>
+            <span class="small muted">No surge. Waiting at the store over 10 min is ₹1/min, shown live.</span>
+          </div>
+          <button class="cta" onclick="go('track')">Place errand</button>
+        </div>
+      </section>
+
+      <!-- TRACK -->
+      <section class="view" id="v-track" hidden>
+        <div class="stack">
+          <button class="back" onclick="go('create')">← Errand details</button>
+          <h2>Ravi is at Sri Sai Medicals</h2>
+          <div class="map"><canvas id="map" width="720" height="300" aria-label="Route map"></canvas></div>
+          <div class="rider"><div class="av">RK</div><div style="flex:1"><b>Ravi K.</b><div class="small muted">4.9 ★ · 1,240 errands · KA 01 HM 4471</div></div><button class="chip">Call</button></div>
+          <div class="track">
+            <div class="step done"><span class="dot"></span><div><b>Errand accepted</b><div class="small muted">9:12 AM</div></div></div>
+            <div class="step done"><span class="dot"></span><div><b>Reached the store</b><div class="small muted">9:24 AM</div></div></div>
+            <div class="step now"><span class="dot"></span><div><b>Proof ready for you</b><div class="small muted">Check the item and bill before Ravi pays</div></div></div>
+            <div class="step"><span class="dot"></span><div><b>On the way</b></div></div>
+            <div class="step"><span class="dot"></span><div><b>Handover with OTP</b></div></div>
+          </div>
+          <button class="cta sun" onclick="go('proof')">Review proof</button>
+        </div>
+      </section>
+
+      <!-- PROOF MOMENT -->
+      <section class="view" id="v-proof" hidden>
+        <div class="stack">
+          <button class="back" onclick="go('track')">← Tracking</button>
+          <div class="row between"><h2>Proof Moment</h2><span class="timer" id="tmr">04:59</span></div>
+          <div class="proof">
+            <div class="proof-img">
+              <div class="ph1"><svg width="96" height="70" viewBox="0 0 96 70"><rect x="6" y="10" width="84" height="50" rx="6" fill="#fff"/><rect x="6" y="10" width="84" height="14" rx="6" fill="#0A7A4B"/><text x="48" y="45" text-anchor="middle" font-family="monospace" font-size="10" fill="#333">TELMA 40</text><text x="48" y="56" text-anchor="middle" font-family="monospace" font-size="7" fill="#777">30 tablets</text></svg><span class="stamp">09:26 · Jayanagar</span></div>
+              <div class="ph2"><div class="receipt">SRI SAI MEDICALS<br>Jayanagar 4th Blk<hr><div class="rl"><span>Telma 40 ×3</span><span>372.00</span></div><div class="rl"><span>GST</span><span>18.60</span></div><hr><div class="rl"><b>TOTAL</b><b>390.60</b></div></div><span class="stamp">Bill · auto-read</span></div>
+            </div>
+            <div class="verdict">
+              <div class="row between"><b>Telma 40 · 3 strips</b><span class="ok">Matches request</span></div>
+              <div class="row between small"><span class="muted">Bill total (read from photo)</span><span class="mono">₹390.60 of ₹500 cap</span></div>
+              <div class="meter"><i style="width:78%"></i></div>
+            </div>
+          </div>
+          <button class="cta" onclick="go('otp')">Approve · Ravi pays ₹390.60</button>
+          <button class="cta ghost" onclick="toast('Ravi will show you alternatives in a moment')">Ask for a different brand</button>
+          <p class="small muted">No answer in 5 minutes? Ravi calls you before buying anything.</p>
+        </div>
+      </section>
+
+      <!-- OTP -->
+      <section class="view" id="v-otp" hidden>
+        <div class="stack">
+          <h2>On the way to Amma</h2>
+          <p class="muted">Arriving in about 12 minutes. Share this code at the door, so it only goes to the right person.</p>
+          <div class="otp" aria-label="Handover code 4 8 2 1"><span>4</span><span>8</span><span>2</span><span>1</span></div>
+          <button class="chip" style="align-self:center" onclick="toast('Code sent to Amma on WhatsApp')">Send code to Amma on WhatsApp</button>
+          <div class="bill">
+            <div class="row"><span>Item (bill attached)</span><span class="mono">₹390.60</span></div>
+            <div class="row"><span>Errand fee</span><span class="mono" id="o-fee">₹69</span></div>
+            <div class="row total"><span>Charged</span><span class="mono" id="o-tot">₹459.60</span></div>
+          </div>
+          <button class="cta" onclick="go('done')">Simulate handover</button>
+        </div>
+      </section>
+
+      <!-- DONE -->
+      <section class="view" id="v-done" hidden>
+        <div class="stack">
+          <div class="done-hero"><div class="badge"><svg width="30" height="30" viewBox="0 0 24 24" fill="none" stroke="var(--green-ink)" stroke-width="3"><path d="M5 12.5l4.5 4.5L19 7.5"/></svg></div>
+            <h2>Delivered to Amma</h2><p class="muted small">9:51 AM · handed over with code 4821</p></div>
+          <div class="stars" id="stars"></div>
+          <div class="promise"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 3l8 3v6c0 4.5-3.4 8.3-8 9-4.6-.7-8-4.5-8-9V6z"/></svg>
+            <div><b>Something wrong?</b><br><span class="muted">Report within 24 hours for a full refund under the Dunzo Promise.</span></div></div>
+          <button class="cta ghost" onclick="toast('Bill saved to Orders')">Download bill</button>
+          <button class="cta" onclick="toast('Saved. Tap it next month to repeat in one step.')">Repeat monthly</button>
+          <button class="back" onclick="go('home')">Back to home</button>
+        </div>
+      </section>
+
+      <!-- SEND -->
+      <section class="view" id="v-send" hidden>
+        <div class="stack">
+          <button class="back" onclick="go('home')">← Back</button>
+          <h2>Send something</h2>
+          <div class="field"><label for="pk">Pick up from</label><input id="pk" value="Office · Prestige Tech Park, Desk 4B"></div>
+          <div class="field"><label for="dp">Drop at</label><input id="dp" value="Home · 27th Main, HSR Layout"></div>
+          <div class="field"><label for="what">What is it?</label><input id="what" value="Laptop charger and house keys"></div>
+          <div class="opts">
+            <button class="opt" aria-pressed="true"><b>Fits in a bag</b><span>Up to 5 kg · ₹69</span></button>
+            <button class="opt" aria-pressed="false"><b>Bulky</b><span>Up to 15 kg · ₹119</span></button>
+          </div>
+          <div class="field"><label for="val">Declared value (covered by Promise)</label><input id="val" class="mono" value="₹3,000"></div>
+          <button class="cta" onclick="go('track')">Book pick-up</button>
+        </div>
+      </section>
+
+      <!-- MERCHANT -->
+      <section class="view" id="v-merchant" hidden>
+        <div class="stack">
+          <div class="row between"><span class="brand">dunzo <span style="font-size:13px;color:var(--muted)">for stores</span></span><span class="small muted">Lakeview Bakery</span></div>
+          <h2>Good morning, Meena</h2>
+          <div class="kpis">
+            <div class="kpi"><b>18</b><span>orders today</span></div>
+            <div class="kpi"><b>₹45</b><span>flat per delivery</span></div>
+            <div class="kpi"><b>T+1</b><span>payout</span></div>
+          </div>
+          <div class="qr"><canvas id="qr" width="21" height="21" aria-label="Sample order QR code"></canvas>
+            <div><b>Your “Order on Dunzo” link</b><div class="small muted mono" style="word-break:break-all">dunzo.in/s/lakeview</div>
+            <div class="row" style="margin-top:8px"><button class="chip" onclick="toast('Link copied')">Copy link</button><button class="chip" onclick="toast('Opening WhatsApp share')">WhatsApp</button></div></div></div>
+          <div>
+            <div class="order"><b>#4120 · 1 kg black forest</b><span class="pill wait">Rider in 4 min</span><span class="small muted">Priya · HSR 27th Main</span><span class="small mono">₹45</span></div>
+            <div class="order"><b>#4119 · 6 croissants</b><span class="pill">Delivered</span><span class="small muted">Arjun · Koramangala 5th Blk</span><span class="small mono">₹45</span></div>
+            <div class="order"><b>#4118 · Birthday cake, custom</b><span class="pill">Delivered</span><span class="small muted">via your website checkout</span><span class="small mono">₹55</span></div>
+          </div>
+          <div class="promise"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="6" width="18" height="13" rx="2"/><path d="M3 10h18"/></svg>
+            <div><b>₹6,240 settles tomorrow, 10 AM</b><br><span class="muted">Yesterday's ₹5,880 was paid on time.</span></div></div>
+        </div>
+      </section>
+
+      <div class="toast" id="toast" hidden></div>
+      <nav class="nav">
+        <button id="n-home" aria-current="true" onclick="go('home')"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 11l8-7 8 7v9H4z"/></svg>Home</button>
+        <button id="n-track" onclick="go('track')"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="10" r="3"/><path d="M12 21s7-6 7-11a7 7 0 10-14 0c0 5 7 11 7 11z"/></svg>Errands</button>
+        <button id="n-merchant" onclick="go('merchant')"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 9l2-5h12l2 5M4 9v11h16V9M4 9h16"/></svg>For stores</button>
+      </nav>
+    </div>
+  </div>
+
+  <aside class="rail">
+    <h1>Back to “anything”, with proof at every step</h1>
+    <p class="lede">A walkthrough of the Dunzo 2.0 relaunch: an asset-light errand app with no dark stores. Follow the flow on the phone, or jump to any screen.</p>
+    <div class="flow" id="flow">
+      <button data-v="home">Home</button><button data-v="create">Budget cap</button><button data-v="track">Tracking</button>
+      <button data-v="proof">Proof Moment</button><button data-v="otp">OTP handover</button><button data-v="done">Delivered</button>
+      <button data-v="send">Send it</button><button data-v="merchant">Store view</button>
+    </div>
+    <div class="note" id="note"></div>
+  </aside>
+</div>
+
+<script>
+const NOTES={
+ home:{e:"Screen 1 · Home",t:"One box for anything",p:"Brings back Dunzo's original job, “get anything done in the city”, which quick-commerce apps can't serve because they only sell their own stock.",b:["Get it / Send it covers both errand types","Neighbourhood stores replace dark stores: no inventory, no write-downs","Promise banner rebuilds trust on the first screen"],m:["Errand starts / visit","Store taps"]},
+ create:{e:"Screen 2 · Create errand",t:"Price is known before the trip",p:"Solves price anxiety (U2). The user sets a cap on the item and sees the full fee up front, with no surge.",b:["Budget cap the rider cannot exceed without approval","Scheduled option at ₹49 lets us batch trips and lift rider utilisation","Wait-time fee is disclosed, protecting unit economics on slow stores"],m:["Quote → order conversion","% scheduled errands"]},
+ track:{e:"Screen 3 · Tracking",t:"A named person, a visible plan",p:"Reliability was the brand's weakest point after the shutdown (U4). Tracking shows each step, including the one where the user must act.",b:["Named rider with rating and vehicle","Step list makes the Proof Moment expected, not a surprise"],m:["On-time %","Support contacts / 100 orders"]},
+ proof:{e:"Screen 4 · Proof Moment",t:"See it before anyone pays",p:"The differentiator. The rider photographs the item and bill; the app reads the bill total and checks it against the cap. Solves verification anxiety (U3).",b:["Geo- and time-stamped photos","Bill auto-read, compared with the cap","Swap or approve in one tap; 5-minute fallback call"],m:["Proof approval rate","Dispute rate &lt; 1.5%","2nd-order rate (A/B: +15% target)"]},
+ otp:{e:"Screen 5 · Handover",t:"Only the right person receives it",p:"An OTP closes the loop for caregivers sending items to family. The code can go straight to the recipient on WhatsApp.",b:["Final charge equals bill plus fee, nothing hidden","Recipient can be someone else (Amma)"],m:["OTP success rate","Wrong-handover claims"]},
+ done:{e:"Screen 6 · Delivered",t:"Close with a guarantee and a habit",p:"Ends with the Promise and a one-tap repeat, turning a one-off errand into a monthly routine that drives frequency.",b:["Digital bill saved to order history","Repeat-monthly template","Rating feeds rider quality score"],m:["30-day repeat rate","Errands / user / month"]},
+ send:{e:"Screen 7 · Send it",t:"Pick-up and drop, covered",p:"The category Swiggy left when it shut Genie in 2025. Size tiers and a declared value keep pricing simple and claims fair.",b:["Two size tiers instead of complex vehicle choices","Declared value covered by the Promise"],m:["Send-it share of orders","Claim rate"]},
+ merchant:{e:"Screen 8 · Dunzo for stores",t:"Delivery for the corner shop",p:"Dunzo Local gives small merchants delivery for their own WhatsApp and website orders at a flat fee, and fixes the trust gap left by delayed dues with visible T+1 payouts.",b:["Shareable “Order on Dunzo” link and QR","Checkout with Dunzo for merchant websites","Payout date always on screen"],m:["Active merchants","Orders / merchant / week","Payout on-time %"]}
+};
+let cur="home", fee=69, tick;
+function go(v){
+  document.querySelectorAll('.view').forEach(s=>s.hidden=s.id!=="v-"+v);
+  cur=v;
+  ["home","track","merchant"].forEach(n=>document.getElementById("n-"+n).setAttribute("aria-current", n===v || (n==="track"&&["create","track","proof","otp","done","send"].includes(v)) ? "true":"false"));
+  document.querySelectorAll('#flow button').forEach(b=>b.setAttribute('aria-current', b.dataset.v===v?"true":"false"));
+  const n=NOTES[v];
+  document.getElementById('note').innerHTML=`<span class="eyebrow">${n.e}</span><h2>${n.t}</h2><p>${n.p}</p><ul>${n.b.map(x=>`<li>${x}</li>`).join("")}</ul><div class="metric">${n.m.map(x=>`<span>${x}</span>`).join("")}</div>`;
+  document.querySelector('#v-'+v).scrollTop=0;
+  if(v==="track") drawMap();
+  if(v==="proof") startTimer(); else clearInterval(tick);
+}
+function setMode(m){document.getElementById('seg-get').setAttribute('aria-pressed',m==='get');document.getElementById('seg-send').setAttribute('aria-pressed',m==='send');
+  document.getElementById('q').value = m==='send' ? 'Laptop charger and keys from office to home' : "Amma's BP tablets from Sri Sai Medicals, Jayanagar";}
+function pick(t){document.getElementById('q').value=t;document.getElementById('item').value=t;}
+function updCap(){const c=+document.getElementById('capr').value;const f="₹"+c.toLocaleString('en-IN');
+  document.getElementById('capv').textContent=f;document.getElementById('b-cap').textContent="up to "+f;
+  document.getElementById('b-tot').textContent="₹"+(c+fee).toLocaleString('en-IN');}
+function speed(s){fee=s==='inst'?69:49;document.getElementById('o-inst').setAttribute('aria-pressed',s==='inst');document.getElementById('o-sch').setAttribute('aria-pressed',s==='sch');
+  document.getElementById('b-fee').textContent="₹"+fee;document.getElementById('o-fee').textContent="₹"+fee;
+  document.getElementById('o-tot').textContent="₹"+(390.6+fee).toFixed(2);updCap();}
+function toast(t){const el=document.getElementById('toast');el.textContent=t;el.hidden=false;clearTimeout(el._t);el._t=setTimeout(()=>el.hidden=true,2200);}
+function startTimer(){clearInterval(tick);let s=299;const el=document.getElementById('tmr');tick=setInterval(()=>{s=Math.max(0,s-1);el.textContent=String(Math.floor(s/60)).padStart(2,'0')+":"+String(s%60).padStart(2,'0');},1000);}
+function css(n){return getComputedStyle(document.documentElement).getPropertyValue(n).trim();}
+function drawMap(){const c=document.getElementById('map'),x=c.getContext('2d');const W=c.width,H=c.height;
+  x.fillStyle=css('--leaf');x.fillRect(0,0,W,H);x.strokeStyle=css('--surface');x.lineWidth=14;
+  [[0,80,W,110],[0,220,W,200],[150,0,190,H],[470,0,430,H],[600,0,650,H]].forEach(l=>{x.beginPath();x.moveTo(l[0],l[1]);x.lineTo(l[2],l[3]);x.stroke();});
+  x.strokeStyle=css('--green');x.lineWidth=7;x.setLineDash([16,12]);x.beginPath();x.moveTo(110,250);x.lineTo(180,205);x.lineTo(440,210);x.lineTo(470,110);x.lineTo(610,95);x.stroke();x.setLineDash([]);
+  [[110,250,'--ink'],[610,95,'--green']].forEach(p=>{x.fillStyle=css(p[2]);x.beginPath();x.arc(p[0],p[1],14,0,7);x.fill();});
+  x.fillStyle=css('--sun');x.beginPath();x.arc(440,210,16,0,7);x.fill();
+  x.font="600 22px sans-serif";x.fillStyle=css('--ink');x.fillText("Sri Sai Medicals",380,250);x.fillText("Amma's home",540,60);}
+function drawQR(){const c=document.getElementById('qr'),x=c.getContext('2d');x.fillStyle="#fff";x.fillRect(0,0,21,21);x.fillStyle="#13241B";
+  let s=7;const r=()=>{s=(s*9301+49297)%233280;return s/233280;};
+  for(let i=0;i<21;i++)for(let j=0;j<21;j++)if(r()>.55)x.fillRect(i,j,1,1);
+  [[0,0],[14,0],[0,14]].forEach(([a,b])=>{x.fillStyle="#fff";x.fillRect(a,b,7,7);x.fillStyle="#13241B";x.fillRect(a,b,7,7);x.fillStyle="#fff";x.fillRect(a+1,b+1,5,5);x.fillStyle="#13241B";x.fillRect(a+2,b+2,3,3);});}
+const st=document.getElementById('stars');for(let i=1;i<=5;i++){const b=document.createElement('button');b.textContent="★";b.setAttribute('aria-label',i+" stars");b.onclick=()=>{[...st.children].forEach((s,k)=>s.classList.toggle('on',k<i));toast("Thanks, Ravi gets your rating");};st.appendChild(b);}
+document.querySelectorAll('#flow button').forEach(b=>b.onclick=()=>go(b.dataset.v));
+document.getElementById('q').addEventListener('input',e=>document.getElementById('item').value=e.target.value);
+drawQR();go('home');
+matchMedia('(prefers-color-scheme: dark)').addEventListener?.('change',()=>cur==='track'&&drawMap());
+</script>
+
+</body>
+</html>
