@@ -1,0 +1,206 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="description" content="Fireflies.ai capstone prototype: claim, close and carry forward meeting commitments. By Sakshi Utturi.">
+<title>Fireflies Commitment Loop</title>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,600;9..144,700&family=Figtree:wght@400;500;600;700&family=IBM+Plex+Mono:wght@500&display=swap">
+<style>
+/* Layout: app shell — left rail of 6 screens (2 existing, 4 new), working canvas on the right; collapses to top tabs on phones */
+:root{
+  --bg:#FBF9FE; --surface:#FFFFFF; --ink:#1E1B2E; --muted:#6B6584; --line:#E4DEF2;
+  --indigo:#2A1B5E; --mag:#D6336C; --tint:#F1ECFA; --good:#2E8B60; --warn:#B7791F; --drop:#6E6A80;
+  --slack:#FFFFFF; --chip:#EEE9F8;
+  --display:'Fraunces', Cambria, Georgia, serif; --body:'Figtree', 'Segoe UI', system-ui, sans-serif; --mono:'IBM Plex Mono', ui-monospace, monospace;
+}
+@media (prefers-color-scheme: dark){:root:not([data-theme="light"]){
+  --bg:#14111F; --surface:#1D1930; --ink:#ECE8F7; --muted:#A39DBB; --line:#332D4C;
+  --indigo:#C7B8F5; --mag:#F0709C; --tint:#271F42; --good:#5CC495; --warn:#E3B05A; --drop:#A6A1B8; --slack:#1D1930; --chip:#2C2547; color-scheme:dark}}
+:root[data-theme="dark"]{
+  --bg:#14111F; --surface:#1D1930; --ink:#ECE8F7; --muted:#A39DBB; --line:#332D4C;
+  --indigo:#C7B8F5; --mag:#F0709C; --tint:#271F42; --good:#5CC495; --warn:#E3B05A; --drop:#A6A1B8; --slack:#1D1930; --chip:#2C2547; color-scheme:dark}
+*{box-sizing:border-box}
+body{background:var(--bg);color:var(--ink);font-family:var(--body);font-size:15px;line-height:1.5}
+.app{display:grid;grid-template-columns:250px minmax(0,1fr);min-height:100vh}
+nav{border-right:1px solid var(--line);padding-block:24px;padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:16px;display:flex;flex-direction:column;gap:6px;position:sticky;top:0;align-self:start;height:100vh}
+.brand{font-family:var(--display);font-weight:700;font-size:20px;color:var(--indigo);margin-bottom:2px}
+.sub{font-size:12px;color:var(--muted);margin-bottom:16px}
+.grp{font-size:11px;letter-spacing:.08em;text-transform:uppercase;color:var(--muted);margin:12px 0 4px}
+nav button{all:unset;cursor:pointer;padding:9px 12px;border-radius:8px;font-weight:500;display:flex;gap:10px;align-items:center}
+nav button:hover{background:var(--tint)}
+nav button[aria-current="true"]{background:var(--tint);color:var(--indigo);font-weight:700}
+nav button:focus-visible,.btn:focus-visible{outline:2px solid var(--mag);outline-offset:2px}
+.n{font-family:var(--mono);font-size:12px;color:var(--muted);width:18px}
+.meter{margin-top:auto;padding:12px;border:1px solid var(--line);border-radius:10px;background:var(--surface)}
+.meter b{font-family:var(--display);font-size:28px;color:var(--mag)}
+.bar{height:6px;background:var(--chip);border-radius:3px;overflow:hidden;margin:6px 0}
+.bar i{display:block;height:100%;background:var(--mag);transition:width .4s}
+main{padding-block:28px 60px;padding-left:28px;padding-right:max(28px,env(safe-area-inset-right,0px));max-width:980px;min-width:0}
+h1{font-family:var(--display);font-size:30px;line-height:1.15;margin:0 0 6px;color:var(--indigo);text-wrap:balance}
+.lede{color:var(--muted);margin:0 0 22px;max-width:62ch}
+.tag{display:inline-block;font-size:11px;font-weight:700;letter-spacing:.06em;text-transform:uppercase;padding:2px 8px;border-radius:99px;margin-bottom:10px}
+.tag.ex{background:var(--chip);color:var(--muted)}.tag.nw{background:var(--mag);color:#fff}
+.panel{background:var(--surface);border:1px solid var(--line);border-radius:12px;padding:18px}
+.stack{display:flex;flex-direction:column;gap:14px}
+.row{display:flex;gap:10px;flex-wrap:wrap;align-items:center}
+.btn{all:unset;cursor:pointer;padding:7px 14px;border-radius:8px;border:1px solid var(--line);font-weight:600;font-size:14px;background:var(--surface)}
+.btn:hover{border-color:var(--indigo)}
+.btn.pri{background:var(--indigo);color:var(--bg);border-color:var(--indigo)}
+.chipb{all:unset;cursor:pointer;padding:5px 12px;border-radius:99px;background:var(--chip);font-size:13px;font-weight:500}
+.chipb.on{background:var(--indigo);color:var(--bg)}
+.slack{background:var(--slack);border:1px solid var(--line);border-radius:12px;padding:16px;display:flex;gap:12px}
+.av{width:36px;height:36px;border-radius:8px;background:var(--mag);color:#fff;display:grid;place-items:center;font-weight:700;flex:none}
+.who{font-weight:700}.ts{color:var(--muted);font-size:12px;margin-left:6px;font-weight:400}
+.item{border:1px solid var(--line);border-radius:10px;padding:12px 14px;display:flex;flex-direction:column;gap:8px;background:var(--surface)}
+.it{font-weight:600}.meta{font-size:13px;color:var(--muted)}
+.st{font-size:12px;font-weight:700;padding:2px 8px;border-radius:99px;white-space:nowrap}
+.st.done{background:color-mix(in srgb,var(--good) 18%,transparent);color:var(--good)}
+.st.open{background:var(--tint);color:var(--indigo)}
+.st.pend{background:color-mix(in srgb,var(--warn) 18%,transparent);color:var(--warn)}
+.st.drop{background:var(--chip);color:var(--drop)}
+.conf{font-family:var(--mono);font-size:12px;color:var(--muted)}
+.email{font-family:var(--body)}.email .hdr{border-bottom:1px solid var(--line);padding-bottom:10px;margin-bottom:10px;font-size:13px;color:var(--muted)}
+.callout{border-left:3px solid var(--mag);padding:8px 12px;background:var(--tint);border-radius:0 8px 8px 0;font-size:14px}
+.grid3{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:14px}
+.big{font-family:var(--display);font-size:44px;font-weight:700;line-height:1;font-variant-numeric:tabular-nums}
+.split{display:flex;height:14px;border-radius:7px;overflow:hidden;background:var(--chip)}
+.split span{display:block;height:100%}
+.toast{position:fixed;bottom:calc(20px + env(safe-area-inset-bottom,0px));right:max(20px,env(safe-area-inset-right,0px));background:var(--indigo);color:var(--bg);padding:10px 16px;border-radius:10px;font-weight:600;opacity:0;transform:translateY(8px);transition:.25s;pointer-events:none;max-width:calc(100vw - 40px)}
+.toast.show{opacity:1;transform:none}
+.sub-panel{background:var(--tint);border-radius:10px;padding:12px;display:flex;flex-direction:column;gap:10px}
+select,input[type=date]{font:inherit;padding:6px 8px;border-radius:8px;border:1px solid var(--line);background:var(--surface);color:var(--ink)}
+.mute{color:var(--muted);font-size:13px}
+@media (max-width:760px){
+  .app{grid-template-columns:1fr}
+  nav{position:static;height:auto;border-right:0;border-bottom:1px solid var(--line);flex-direction:row;flex-wrap:wrap;padding-right:max(16px,env(safe-area-inset-right,0px))}
+  .brand,.sub{width:100%}.grp{display:none}.meter{width:100%;margin-top:8px}
+  main{padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px))}
+  .grid3{grid-template-columns:1fr}
+}
+@media (prefers-reduced-motion:reduce){*{transition:none!important}}
+</style>
+<style>html,body{margin:0}[hidden]{display:none!important}</style>
+</head>
+<body>
+<div class="app">
+  <nav aria-label="Prototype screens">
+    <div class="brand">Commitment Loop</div>
+    <div class="sub">Fireflies.ai concept · Sakshi Utturi</div>
+    <div class="grp">Existing Fireflies</div>
+    <button data-s="meeting"><span class="n">1</span>Meeting page</button>
+    <button data-s="email"><span class="n">2</span>Recap email</button>
+    <div class="grp">New</div>
+    <button data-s="claim"><span class="n">3</span>Claim cards</button>
+    <button data-s="check"><span class="n">4</span>Closure check</button>
+    <button data-s="brief"><span class="n">5</span>Next-meeting pre-brief</button>
+    <button data-s="health"><span class="n">6</span>Team health</button>
+    <div class="meter" aria-live="polite">
+      <div class="mute">14-day honest resolution</div>
+      <b id="mPct">0%</b>
+      <div class="bar"><i id="mBar" style="width:0%"></i></div>
+      <div class="mute" id="mTxt"></div>
+      <button class="btn" id="reset" style="margin-top:10px;font-size:12px;padding:4px 10px">Reset demo</button>
+    </div>
+  </nav>
+  <main id="view"></main>
+</div>
+<div class="toast" id="toast" role="status"></div>
+
+<script>
+const PEOPLE={A:'Arjun (Backend)',M:'Meera (Design)',P:'Priya (PM)',R:'Rahul (Eng Manager)'};
+const seed=()=>[
+ {id:1,owner:'A',text:'Send revised API estimate',due:'Fri 31 Oct',conf:0.92,state:'sent',home:null,quote:'"I\'ll send the revised API estimate by Friday."'},
+ {id:2,owner:'M',text:'Share updated onboarding mocks',due:'Thu 30 Oct',conf:0.88,state:'sent',home:null,quote:'"Let me share the updated onboarding mocks before Thursday."'},
+ {id:3,owner:'P',text:'Check pricing page copy with marketing',due:null,conf:0.74,state:'sent',home:null,quote:'"I can check the pricing copy with marketing."'},
+ {id:4,owner:null,text:'Look into flaky tests',due:null,conf:0.41,state:'review',home:null,quote:'"We should look into the flaky tests at some point."'}];
+let S={items:seed(),screen:'meeting',open:{},jiraDone:false};
+const $=s=>document.querySelector(s);
+function toast(t){const el=$('#toast');el.textContent=t;el.classList.add('show');clearTimeout(toast.h);toast.h=setTimeout(()=>el.classList.remove('show'),2400)}
+const counted=()=>S.items.filter(i=>!['review','dismissed'].includes(i.state));
+const resolved=()=>counted().filter(i=>['done','reassigned','dropped'].includes(i.state));
+function meter(){const c=counted().length,r=resolved().length,p=c?Math.round(r/c*100):0;
+ $('#mPct').textContent=p+'%';$('#mBar').style.width=p+'%';$('#mTxt').textContent=`${r} of ${c} resolved · baseline 28% · target 45%`;}
+const badge=i=>({sent:['open','Awaiting claim'],claimed:['open','Open'],pending:['pend','Waiting for '+(PEOPLE[i.to]||'').split(' ')[0]+' to accept'],done:['done','Done'],reassigned:['done','Reassigned & accepted'],dropped:['drop','Dropped — '+(i.reason||'')],snoozed:['open','Snoozed 3 days'],review:['drop','Low confidence — not sent'],dismissed:['drop','Not a commitment']})[i.state];
+const B=i=>{const[c,t]=badge(i);return `<span class="st ${c}">${t}</span>`};
+function go(s){S.screen=s;render()}
+function render(){
+ document.querySelectorAll('nav button[data-s]').forEach(b=>b.setAttribute('aria-current',b.dataset.s===S.screen));
+ $('#view').innerHTML=V[S.screen]();meter();
+}
+const V={
+meeting:()=>`<span class="tag ex">Existing Fireflies</span><h1>Weekly Product Sync — Tue 28 Oct</h1>
+<p class="lede">Today Fireflies records, summarises and extracts action items well. Nobody is asked whether an item is theirs.</p>
+<div class="stack"><div class="panel"><div class="meta">Attendees: Priya · Arjun · Meera · Rahul</div><h3 style="margin:8px 0 6px">AI summary</h3>
+<p style="margin:0">Team reviewed the onboarding redesign and the API timeline. Pricing copy needs a marketing review before launch. Flaky tests are slowing CI.</p></div>
+<div class="panel"><h3 style="margin:0 0 10px">Action items</h3><div class="stack">${S.items.map(i=>`<div class="row" style="justify-content:space-between"><div><div class="it">${i.text}</div><div class="meta">${i.quote}</div></div><span class="conf">${i.owner?PEOPLE[i.owner].split(' ')[0]:'Unassigned'}</span></div>`).join('')}</div></div>
+<div class="callout">Gap: these items are a list, not owned commitments. No acceptance, no drop option, no carry-over to the next meeting.</div>
+<div><button class="btn pri" onclick="go('email')">Next: what everyone receives →</button></div></div>`,
+email:()=>`<span class="tag ex">Existing Fireflies</span><h1>The recap email goes to everyone</h1>
+<p class="lede">A commitment sent to the whole room is owned by no one. This is loss point 1.</p>
+<div class="panel email"><div class="hdr">From: Fireflies.ai Notetaker<br>To: priya@, arjun@, meera@, rahul@<br>Subject: Meeting recap — Weekly Product Sync</div>
+<p><b>Action items</b></p><ul>${S.items.map(i=>`<li>${i.text}${i.owner?' — '+PEOPLE[i.owner].split(' ')[0]:''}</li>`).join('')}</ul>
+<p class="mute">View full transcript in Fireflies →</p></div>
+<div class="callout" style="margin-top:14px">What happens next today: 72% of items like these are never explicitly closed within 14 days.</div>
+<div style="margin-top:14px"><button class="btn pri" onclick="go('claim')">See the new experience →</button></div>`,
+claim:()=>{const send=S.items.filter(i=>i.state!=='review');const rev=S.items.filter(i=>i.state==='review');
+ return `<span class="tag nw">New · Claim</span><h1>Each commitment goes privately to its likely owner</h1>
+<p class="lede">Sent as a Slack DM 10 minutes after the meeting. Ownership exists only once the person taps "It's mine". Low-confidence items are never sent.</p>
+<div class="stack">${send.map(card).join('')}
+<div class="panel"><b>Review list (not sent)</b><p class="mute" style="margin:4px 0 8px">Below the 0.6 confidence threshold or no clear owner, so nobody gets notified.</p>${rev.map(i=>`<div class="row" style="justify-content:space-between"><span>${i.quote}</span><span class="conf">conf ${i.conf}</span></div>`).join('')}</div>
+<div><button class="btn pri" onclick="go('check')">Day 3: Closure check →</button></div></div>`},
+check:()=>{const open=S.items.filter(i=>['claimed','snoozed'].includes(i.state));const j=S.items.find(i=>i.id===1);
+ return `<span class="tag nw">New · Close</span><h1>One batched check-in, four equal choices</h1>
+<p class="lede">Day 3 and Day 7, one Slack message per person, never per-item pings. Drop is as easy as Done.</p>
+<div class="slack"><div class="av">F</div><div class="stack" style="flex:1;min-width:0"><div><span class="who">Fireflies</span><span class="ts">Fri 9:30 AM</span></div>
+<div>Day 3 check-in: ${open.length} open commitment${open.length===1?'':'s'} from <b>Weekly Product Sync</b>. Only you can see this.</div>
+${j.state==='claimed'&&j.home==='Jira'?`<div class="callout">Jira says <b>JIRA-482</b> (${j.text}) is Done. Mark resolved? <button class="btn" onclick="act(1,'done','Resolved from Jira status')">Confirm</button></div>`:''}
+${open.length?open.map(checkItem).join(''):'<div class="mute">Nothing open. Claim items on screen 3 to see them here.</div>'}
+</div></div><div style="margin-top:14px"><button class="btn pri" onclick="go('brief')">Next meeting: Pre-brief →</button></div>`},
+brief:()=>{const shared=S.items.filter(i=>!i.private&&!['review','dismissed'].includes(i.state));
+ const g=k=>shared.filter(i=>k.includes(i.state));const open=g(['claimed','snoozed','sent','pending']),closed=g(['done','reassigned']),drop=g(['dropped']);
+ const li=(i,btn)=>`<div class="item"><div class="row" style="justify-content:space-between"><div class="it">${i.text}</div>${B(i)}</div><div class="row" style="justify-content:space-between"><span class="meta">${i.owner?PEOPLE[i.owner]:'Unclaimed'}</span>${btn?`<div class="row"><button class="btn" onclick="act(${i.id},'done','Closed in meeting')">Close</button><button class="btn" onclick="priv(${i.id})">Keep private</button></div>`:''}</div></div>`;
+ return `<span class="tag nw">New · Carry forward</span><h1>Pre-brief: Weekly Product Sync — Tue 4 Nov</h1>
+<p class="lede">Posted to the meeting's Slack channel 15 minutes before. Only items shared to this meeting appear; owners can keep any item private.</p>
+<div class="stack"><div><b>Still open (${open.length})</b><div class="stack" style="margin-top:8px">${open.map(i=>li(i,1)).join('')||'<span class="mute">Nothing open. A short meeting.</span>'}</div></div>
+<div><b>Closed since last week (${closed.length})</b><div class="stack" style="margin-top:8px">${closed.map(i=>li(i)).join('')||'<span class="mute">None yet.</span>'}</div></div>
+<div><b>Dropped (${drop.length})</b><div class="stack" style="margin-top:8px">${drop.map(i=>li(i)).join('')||'<span class="mute">None.</span>'}</div></div>
+<div><button class="btn pri" onclick="go('health')">Team health →</button></div></div>`},
+health:()=>{const c=counted(),r=resolved(),p=c.length?Math.round(r.length/c.length*100):0;const n=k=>c.filter(i=>i.state===k).length;const w=k=>c.length?n(k)/c.length*100:0;
+ return `<span class="tag nw">New · Team view</span><h1>Commitment Health — Product team</h1>
+<div class="callout" style="margin-bottom:16px">Team-level view only. No individual tracking, no leaderboard.</div>
+<div class="grid3"><div class="panel"><div class="mute">14-day honest resolution</div><div class="big" style="color:var(--mag)">${p}%</div><div class="mute">Baseline 28% · Target 45%</div></div>
+<div class="panel"><div class="mute">Median time to resolve</div><div class="big">${r.length?'2.5':'—'}<span style="font-size:18px"> days</span></div><div class="mute">Target under 6 days</div></div>
+<div class="panel"><div class="mute">Notifications per person this week</div><div class="big">2.1</div><div class="mute">Cap: 4 per week</div></div></div>
+<div class="panel" style="margin-top:14px"><b>How items were resolved</b><div class="split" style="margin:10px 0"><span style="width:${w('done')}%;background:var(--good)"></span><span style="width:${w('reassigned')}%;background:var(--indigo)"></span><span style="width:${w('dropped')}%;background:var(--drop)"></span></div>
+<div class="row mute"><span>■ Done ${n('done')}</span><span>■ Reassigned ${n('reassigned')}</span><span>■ Dropped ${n('dropped')}</span><span>Open ${c.length-r.length}</span></div>
+<p class="mute" style="margin:10px 0 0">Dropped counts as resolved. A healthy drop share is 10–25%.</p></div>`}
+};
+function card(i){
+ const op=S.open[i.id];let body='';
+ if(i.state==='sent'&&!op) body=`<div class="row"><button class="btn pri" onclick="openP(${i.id},'mine')">It's mine</button><button class="btn" onclick="openP(${i.id},'not')">Not mine</button><button class="btn" onclick="act(${i.id},'dismissed','Thanks — this improves future extraction')">Not a commitment</button></div>`;
+ else if(i.state==='sent'&&op==='mine') body=`<div class="sub-panel"><label class="meta" for="due${i.id}">Due date</label><select id="due${i.id}"><option>${i.due||'Pick a date'}</option><option>Mon 3 Nov</option><option>Fri 7 Nov</option></select>
+  <div class="meta">Where should it live?</div><div class="row">${['Jira','Asana','Calendar','Keep in Fireflies'].map(h=>`<button class="chipb" onclick="claim(${i.id},'${h}')">${h}</button>`).join('')}</div></div>`;
+ else if(i.state==='sent'&&op==='not') body=`<div class="sub-panel"><label class="meta" for="to${i.id}">Who should own this? They'll get their own card and must accept.</label><select id="to${i.id}">${Object.keys(PEOPLE).filter(k=>k!==i.owner).map(k=>`<option value="${k}">${PEOPLE[k]}</option>`).join('')}</select><div><button class="btn pri" onclick="reassign(${i.id})">Suggest owner</button></div></div>`;
+ else if(i.state==='pending') body=`<div class="row"><span class="mute">Demo: act as ${PEOPLE[i.to]}</span><button class="btn" onclick="act(${i.id},'reassigned','${PEOPLE[i.to].split(' ')[0]} accepted ownership')">Accept</button></div>`;
+ return `<div class="slack"><div class="av">F</div><div class="stack" style="flex:1;min-width:0"><div><span class="who">Fireflies</span><span class="ts">to ${PEOPLE[i.owner].split(' ')[0]} · 10:42 AM</span></div>
+ <div>We think you said: <b>${i.text}</b>${i.due?` (due ${i.due})`:''}</div><div class="meta">${i.quote} · <span class="conf">conf ${i.conf}</span> · Only you can see this.</div>
+ <div class="row">${B(i)}${i.home?`<span class="mute">Lives in ${i.home}${i.home==='Jira'?' · JIRA-482':''}</span>`:''}</div>${body}</div></div>`;
+}
+function checkItem(i){const op=S.open['d'+i.id];
+ return `<div class="item"><div class="row" style="justify-content:space-between"><div class="it">${i.text}</div>${B(i)}</div>
+ ${op?`<div class="sub-panel"><div class="meta">Why drop it? (optional, shared neutrally)</div><div class="row">${['Priorities changed','No longer needed','Done elsewhere','Other'].map(r=>`<button class="chipb" onclick="drop(${i.id},'${r}')">${r}</button>`).join('')}</div></div>`
+ :`<div class="row"><button class="btn pri" onclick="act(${i.id},'done','Marked done')">Done</button><button class="btn" onclick="S.open[${i.id}]='not';i=S.items.find(x=>x.id===${i.id});i.state='sent';go('claim')">Reassign</button><button class="btn" onclick="S.open['d${i.id}']=1;render()">Drop</button><button class="btn" onclick="act(${i.id},'snoozed','Snoozed for 3 days')">Snooze 3d</button></div>`}</div>`}
+function openP(id,k){S.open[id]=k;render()}
+function claim(id,h){const i=S.items.find(x=>x.id===id);i.state='claimed';i.home=h;delete S.open[id];render();toast(h==='Jira'?'Created JIRA-482, assigned to you':h==='Calendar'?'30 min blocked on your calendar':'Claimed — it\'s yours')}
+function reassign(id){const i=S.items.find(x=>x.id===id);i.to=$('#to'+id).value;i.state='pending';delete S.open[id];render();toast('Suggested — pending their acceptance')}
+function act(id,st,msg){const i=S.items.find(x=>x.id===id);i.state=st;render();toast(msg)}
+function drop(id,r){const i=S.items.find(x=>x.id===id);i.state='dropped';i.reason=r.toLowerCase();delete S.open['d'+id];render();toast('Dropped — that counts as closed')}
+function priv(id){S.items.find(x=>x.id===id).private=true;render();toast('Hidden from the Pre-brief')}
+document.querySelectorAll('nav button[data-s]').forEach(b=>b.onclick=()=>go(b.dataset.s));
+$('#reset').onclick=()=>{S={items:seed(),screen:'meeting',open:{}};render();toast('Demo reset')};
+render();
+</script>
+
+</body>
+</html>
