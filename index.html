@@ -122,7 +122,7 @@ blockquote cite{display:block;font-style:normal;font-family:var(--display);font-
 .years p{font-size:.98rem;margin:.4rem 0 0}
 
 /* smaller cases */
-.more{display:grid;grid-template-columns:repeat(3,1fr);gap:1.5rem;margin-top:2.5rem}
+.more{display:grid;grid-template-columns:repeat(2,1fr);gap:1.5rem;margin-top:2.5rem}
 .more article{background:var(--surface);border:1px solid var(--line);border-radius:6px;padding:1.4rem}
 .more h3{font-size:1.2rem;margin-bottom:.6rem}
 .more p{font-size:1rem;margin-bottom:.6em}
@@ -190,16 +190,69 @@ footer{padding:2rem 0 3rem;color:var(--muted);font-family:var(--display);font-si
   <div class="wrap hero">
     <h1>I spent three years building software. <span>Now I'm learning to decide what gets built.</span></h1>
     <p class="lede">I'm Sakshi Utturi, a full-stack engineer at Clarivate Analytics in Bangalore and an aspiring product manager. These are the product problems I've worked through so far: who has the problem, what I'd build, and how I'd know it worked.</p>
-    <p class="status"><b>Currently:</b> completing the Artribe Product Management program, capstone project under way.</p>
+    <p class="status"><b>Latest:</b> completed my capstone, a Fireflies.ai case study with user research and a working prototype, as part of the Airtribe Product Management program.</p>
   </div>
 
   <section id="cases">
     <div class="wrap">
       <h2 class="sec-title">Case studies</h2>
       <div class="tools">
-        <p class="sec-note">Each case study is a product problem I worked through during the Artribe Product Management program. They are independent course projects, not work done for the companies named, and any figure I estimated is marked as an estimate. Select one to read the full write-up.</p>
+        <p class="sec-note">Each case study is a product problem I worked through during the Airtribe Product Management program. They are independent course projects, not work done for the companies named, and any figure I estimated is marked as an estimate. Select one to read the full write-up.</p>
         <button class="all" type="button" data-open="0">Open all</button>
       </div>
+
+      <details class="case">
+        <summary>
+          <h3>Fireflies.ai: Commitment Loop</h3>
+          <span class="q"><span class="question">The meeting ends with "I'll send it by Friday." Why does it so rarely get closed?</span><span class="kind">Capstone: user research, product design, PRD, prototype, metrics</span></span>
+          <span class="toggle" aria-hidden="true"></span>
+        </summary>
+        <div class="case-body">
+          <div class="rail">
+          <dl>
+            <dt>Product</dt><dd>Fireflies.ai, an AI meeting notetaker</dd>
+            <dt>Research</dt><dd>32 people: a 31-response survey and 3 video interviews</dd>
+            <dt>Delivered</dt><dd>Deck, PRD, research document, prototype, recorded walkthrough</dd>
+            <dt>Prototype</dt><dd><a href="https://meeting-promise-loop.lovable.app" target="_blank" rel="noopener">Lovable version</a><br><a href="fireflies-commitment-loop.html" target="_blank" rel="noopener">Coded version</a></dd>
+          </dl>
+        </div>
+          <div class="story">
+          <p>Fireflies records meetings and picks out action items well. Then it emails that list to everyone in the room, so nobody feels the item is theirs. Only 28% of extracted commitments are closed within 14 days, meaning done, handed to someone who accepted it, or dropped on purpose. The brief was to reach 45% in six months without turning Fireflies into a task manager, flooding people with notifications, or letting managers watch individuals.</p>
+
+          <h4>What I did</h4>
+          <ul>
+            <li>Asked each person to trace one real commitment from the last few weeks: where it went after the meeting, what happened 14 days later, and why it stalled. I covered both the people who make commitments and the managers who depend on them.</li>
+            <li>Tore down Fireflies' post-meeting flow and compared how Otter, Read AI, Granola, Fellow, Jira and Slack handle the same promise.</li>
+            <li>Worked from symptoms to a root cause, ranked 13 ideas with RICE, and wrote a PRD for the top two.</li>
+          </ul>
+
+          <h4>What I found</h4>
+          <ul>
+            <li>52% of the traced commitments were still unresolved after about two weeks.</li>
+            <li>Where a commitment lands decides whether it closes: 86% when it went into Jira or Asana, 27% when it stayed in someone's memory, 20% as a Slack note.</li>
+            <li>"Priorities changed" caused half of the unresolved items, yet only 1 person in 31 had dropped a commitment on purpose. Plans change, but there is no easy way to say so.</li>
+            <li>42% wanted their manager to see only team-level totals, or nothing at all.</li>
+          </ul>
+          <blockquote>"It would be helpful if it could recognize when priorities have changed and stop reminding me about dropped work."<cite>Product designer</cite></blockquote>
+          <blockquote>"Sometimes multiple people discuss a task and nobody knows who owns it."<cite>Finance team member</cite></blockquote>
+
+          <h4>What changed my mind</h4>
+          <p>I expected unclear ownership to be the main reason commitments stall. Only 1 of the 16 unresolved items was blamed on it. So I reframed the problem: a commitment never becomes an owned item with a home and a one-tap way to close it, or to drop it honestly when plans change.</p>
+
+          <h4>What I proposed</h4>
+          <div class="ideas">
+            <div><h5>Claim</h5><p>About ten minutes after the meeting, each commitment goes privately to the person who said it: It's mine, Not mine, or Not a commitment. Claiming sets a due date and a home in Jira, Asana, the calendar or Fireflies. Unclear "we should…" items go to the host, never to people.</p><small>Measured by: claim rate within 24 hours (target 55% or more)</small></div>
+            <div><h5>Close</h5><p>One check-in on day 3 and day 7, covering every open item, with Done, Reassign, Drop and Snooze as equal buttons. Dropping counts as closure and is never shown as failure.</p><small>Measured by: check-in action rate; median time to close</small></div>
+            <div><h5>Carry forward</h5><p>Fifteen minutes before the next recurring meeting, the team sees only what is still open from last time, and owners can keep any item private.</p><small>Measured by: pre-brief open rate; items raised again in later meetings</small></div>
+          </div>
+
+          <h4>How I'd measure it</h4>
+          <p>North Star: the 14-day honest resolution rate, from 28% to 45%. Guardrails keep it honest: at most four notifications per person a week, a cap on dismissals so nobody shrinks the denominator, drops held between 10% and 25% of closures, and no per-person manager view. The rollout is a six-week pilot with 20 Slack and Jira teams, then an A/B test randomised by workspace, because commitments move between teammates.</p>
+
+          <p class="limits"><strong>Limits I'd flag.</strong> Findings are self-reported, and some survey answers were collected in conversation and entered by me. I did not interview a tool buyer directly. The projected 46% resolution is a model built on stated assumptions, to be tested in the pilot.</p>
+        </div>
+        </div>
+      </details>
 
       <details class="case">
         <summary>
@@ -402,11 +455,6 @@ footer{padding:2rem 0 3rem;color:var(--muted);font-family:var(--display);font-si
           <p>A design brief for taking a food delivery app from 5,000 to 2,000,000 users in 12 months.</p>
           <p>I framed each requirement by what it demands of the system: fast location-based search for browsing, durable transactions for orders, and a high-volume stream for live rider tracking.</p>
         </article>
-        <article class="soon">
-          <p class="kind">In progress</p>
-          <h3>Capstone project</h3>
-          <p>My end-of-program capstone is under way. The full case study will be added here once it's complete.</p>
-        </article>
       </div>
     </div>
   </section>
@@ -439,7 +487,7 @@ footer{padding:2rem 0 3rem;color:var(--muted);font-family:var(--display);font-si
             <b>AI tools</b>
             Claude Code: subagents, custom skills, project context files, design tokens
             <b>Studying now</b>
-            Artribe Product Management program; Mixpanel Fundamentals; Google Cloud Generative AI Fundamentals; Atlassian Agile in Jira
+            Airtribe Product Management program; Mixpanel Fundamentals; Google Cloud Generative AI Fundamentals; Atlassian Agile in Jira
             <b>Education</b>
             B.Tech in Mechanical Engineering, KLE Dr M.S. Sheshgiri College of Engineering and Technology
           </p>
